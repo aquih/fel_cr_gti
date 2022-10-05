@@ -16,7 +16,7 @@ class AccountMove(models.Model):
 
     def _post(self, soft=True):
         logging.warn('_post');
-        if self.certificar():
+        if self.certificar_cr():
             return super(AccountMove, self)._post(soft)
 
     def post(self):
