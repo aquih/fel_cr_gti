@@ -76,7 +76,7 @@ class AccountMove(models.Model):
                 if factura.partner_id.canton_fel:
                     doc['Encabezado']['Receptor']['Canton'] = factura.partner_id.canton_fel
                 if factura.partner_id.barrio_fel:
-                    doc['Encabezado']['Barrio']['Distrito'] = factura.partner_id.barrio_fel
+                    doc['Encabezado']['Receptor']['Barrio'] = factura.partner_id.barrio_fel
 
                 doc['Lineas'] = []
 
@@ -153,7 +153,7 @@ class AccountMove(models.Model):
 
                 logging.warn(json.dumps(completo, sort_keys=True, indent=4))
                 
-                r = requests.post("http://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
+                r = requests.post("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
                 logging.warn(r.text)
                 
                 resultado = r.json()
@@ -163,7 +163,7 @@ class AccountMove(models.Model):
                     factura.clave_numerica_fel = resultado['Respuestas'][0]['ClaveNumerica']
                     factura.certificador_fel = "gti"
                 else:
-                    factura.error_certificador(resultado)
+                    factura.error_certificador(r.text)
                     return False
 
                 return True
