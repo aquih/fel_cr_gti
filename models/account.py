@@ -15,18 +15,16 @@ class AccountMove(models.Model):
     pdf_fel_name = fields.Char('Nombre PDF FE', default='pdf_fel.pdf', size=32)
 
     def _post(self, soft=True):
-        logging.warn('_post');
         if self.certificar_cr():
             return super(AccountMove, self)._post(soft)
 
     def post(self):
-        logging.warn('post');
         if self.certificar_cr():
             return super(AccountMove, self).post()
     
     def certificar_cr(self):
         for factura in self:
-            logging.warn('certificar_cr');
+            logging.warning('certificar_cr');
             if factura.requiere_certificacion_cr('gticr'):
 
                 if factura.error_pre_validacion_cr():
@@ -76,7 +74,9 @@ class AccountMove(models.Model):
                 if factura.partner_id.canton_fel:
                     doc['Encabezado']['Receptor']['Canton'] = factura.partner_id.canton_fel
                 if factura.partner_id.barrio_fel:
-                    doc['Encabezado']['Barrio']['Distrito'] = factura.partner_id.barrio_fel
+                    doc['Encabezado']['Receptor']['Barrio'] = factura.partner_id.barrio_fel
+                if factura.partner_id.street:
+                    doc['Encabezado']['Receptor']['Direccion'] = factura.partner_id.street
 
                 doc['Lineas'] = []
 
@@ -151,19 +151,19 @@ class AccountMove(models.Model):
                 doc['Totales']['TotalImpuesto'] = total_global_impuestos
                 doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
 
-                logging.warn(json.dumps(completo, sort_keys=True, indent=4))
+                logging.warning(json.dumps(completo, sort_keys=True, indent=4))
                 
-                r = requests.post("http://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
-                logging.warn(r.text)
+                r = requests.post("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
+                logging.warning(r.text)
                 
                 resultado = r.json()
 
-                if resultado['Error'] == 'OK':
+                if 'Respuestas' in resultado and len(resultado['Respuestas']) > 0 and 'Consecutivo' in resultado['Respuestas'][0]:
                     factura.consecutivo_fel = resultado['Respuestas'][0]['Consecutivo']
                     factura.clave_numerica_fel = resultado['Respuestas'][0]['ClaveNumerica']
                     factura.certificador_fel = "gti"
                 else:
-                    factura.error_certificador(resultado)
+                    factura.error_certificador(r.text)
                     return False
 
                 return True
