@@ -69,14 +69,16 @@ class AccountMove(models.Model):
                     doc['Encabezado']['Receptor']['AreaTelefono'] = factura.partner_id.phone.split()[0]
                     doc['Encabezado']['Receptor']['NumTelefono'] = factura.partner_id.phone.split()[1]
                 doc['Encabezado']['Receptor']['CodInterno'] = factura.partner_id.ref
-                if factura.partner_id.provincia_fel:
-                    doc['Encabezado']['Receptor']['Provincia'] = factura.partner_id.provincia_fel
-                if factura.partner_id.canton_fel:
-                    doc['Encabezado']['Receptor']['Canton'] = factura.partner_id.canton_fel
-                if factura.partner_id.barrio_fel:
-                    doc['Encabezado']['Receptor']['Barrio'] = factura.partner_id.barrio_fel
                 if factura.partner_id.street:
-                    doc['Encabezado']['Receptor']['Direccion'] = factura.partner_id.street
+                    doc['Encabezado']['Receptor']['Direccion'] = factura.partner_id.street or '-'
+                if factura.partner_id.provincia_fel:
+                    doc['Encabezado']['Receptor']['Provincia'] = int(factura.partner_id.provincia_fel)
+                if factura.partner_id.canton_fel:
+                    doc['Encabezado']['Receptor']['Canton'] = int(factura.partner_id.canton_fel)
+                if factura.partner_id.distrito_fel:
+                    doc['Encabezado']['Receptor']['Distrito'] = int(factura.partner_id.distrito_fel)
+                if factura.partner_id.barrio_fel:
+                    doc['Encabezado']['Receptor']['Barrio'] = int(factura.partner_id.barrio_fel)
 
                 doc['Lineas'] = []
 
@@ -100,17 +102,16 @@ class AccountMove(models.Model):
                     precio_sin_descuento = linea.price_unit
                     descuento = precio_sin_descuento * linea.quantity - precio_unitario * linea.quantity
                     precio_unitario_base = linea.price_subtotal / linea.quantity
-#                    total_linea = precio_unitario * linea.quantity
-#                    total_linea_base = precio_unitario_base * linea.quantity
-#                    total_impuestos = total_linea - total_linea_base
                     total_linea = linea.price_total
                     total_linea_base = linea.price_subtotal
                     total_impuestos = total_linea - total_linea_base
                     
                     if tipo_producto == 'B':
-                        total_global_mercaderia += linea.price_unit * linea.quantity
+                        #total_global_mercaderia += linea.price_unit * linea.quantity
+                        total_global_mercaderia += total_linea
                     else:
-                        total_global_servicio += linea.price_unit * linea.quantity
+                        #total_global_servicio += linea.price_unit * linea.quantity
+                        total_global_servicio += total_linea
                     total_global_descuento += descuento
                     total_global_impuestos += total_impuestos
                     
@@ -149,7 +150,8 @@ class AccountMove(models.Model):
                 doc['Totales']['TotalDescuento'] = total_global_descuento
                 doc['Totales']['TotalVentaNeta'] = total_global_servicio + total_global_mercaderia - total_global_descuento
                 doc['Totales']['TotalImpuesto'] = total_global_impuestos
-                doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
+                #doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
+                doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia
 
                 logging.warning(json.dumps(completo, sort_keys=True, indent=4))
                 
