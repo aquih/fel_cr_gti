@@ -79,6 +79,8 @@ class AccountMove(models.Model):
                     doc['Encabezado']['Receptor']['Distrito'] = int(factura.partner_id.distrito_fel)
                 if factura.partner_id.barrio_fel:
                     doc['Encabezado']['Receptor']['Barrio'] = int(factura.partner_id.barrio_fel)
+                if factura.partner_id.barrio_fel:
+                    doc['Encabezado']['Receptor']['Correo'] = factura.partner_id.email
 
                 doc['Lineas'] = []
 
@@ -107,18 +109,18 @@ class AccountMove(models.Model):
                     total_impuestos = total_linea - total_linea_base
                     
                     if tipo_producto == 'B':
-                        #total_global_mercaderia += linea.price_unit * linea.quantity
-                        total_global_mercaderia += total_linea
+                        total_global_mercaderia += linea.price_unit * linea.quantity
+                        #total_global_mercaderia += total_linea
                     else:
-                        #total_global_servicio += linea.price_unit * linea.quantity
-                        total_global_servicio += total_linea
+                        total_global_servicio += linea.price_unit * linea.quantity
+                        #total_global_servicio += total_linea
                     total_global_descuento += descuento
                     total_global_impuestos += total_impuestos
                     
                     detalle = {}
                     detalle['Codigo'] = codigo
                     detalle['Cantidad'] = '{:.6f}'.format(linea.quantity)
-                    detalle['UnidadMedida'] = linea.product_uom_id.codigo_fel or '1'
+                    detalle['UnidadMedida'] = linea.product_uom_id.codigo_fel or ('1' if tipo_producto == 'B' else '24')
                     detalle['Descripcion'] = linea.name
                     detalle['PrecioUnitario'] = '{:.6f}'.format(precio_sin_descuento)
                     detalle['Descuentos'] = [{
@@ -150,8 +152,8 @@ class AccountMove(models.Model):
                 doc['Totales']['TotalDescuento'] = total_global_descuento
                 doc['Totales']['TotalVentaNeta'] = total_global_servicio + total_global_mercaderia - total_global_descuento
                 doc['Totales']['TotalImpuesto'] = total_global_impuestos
-                #doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
-                doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia
+                doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
+                #doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia
 
                 logging.warning(json.dumps(completo, sort_keys=True, indent=4))
                 
@@ -172,6 +174,13 @@ class AccountMove(models.Model):
 
             else:
                 return True
+
+    def consultar_pdf(self):
+        logging.warning('consultar_pdf')
+        for factura in self:
+            logging.warning(factura.id)
+            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultarBytesPDF?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            logging.warning(r)
         
 #    def button_cancel(self):
 #        result = super(AccountMove, self).button_cancel()
