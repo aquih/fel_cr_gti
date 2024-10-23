@@ -135,6 +135,14 @@ class AccountMove(models.Model):
                     }]
                     
                     doc['Lineas'].append(detalle)
+
+                if tipo_documento_fel == '3':
+                    doc['Referencia'] = {}
+                    doc['Referencia']['TipoDocRef'] = factura.factura_original_id.journal_id.tipo_documento_cr_fel
+                    doc['Referencia']['NumeroRef'] = factura.factura_original_id.consecutivo_fel
+                    doc['Referencia']['FechaRef'] = factura.factura_original_id.invoice_date.strftime('%Y-%m-%d')+'T00:00:00'
+                    doc['Referencia']['AccionRef'] = '1'
+                    doc['Referencia']['RazonNota'] = factura.ref
                     
                 doc['Totales'] = {}
                 doc['Totales']['TotalServGravado'] = total_global_servicio
@@ -180,6 +188,13 @@ class AccountMove(models.Model):
         for factura in self:
             logging.warning(factura.id)
             r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultarBytesPDF?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            logging.warning(r)
+
+    def consultar_xml(self):
+        logging.warning('consultar_xml')
+        for factura in self:
+            logging.warning(factura.id)
+            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultarXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
             logging.warning(r)
         
 #    def button_cancel(self):
