@@ -12,10 +12,6 @@
                         <button name="consultar_pdf" id="consultar_pdf" string="Consultar PDF" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
                         <button name="consultar_xml" id="consultar_xml" string="Consultar XML" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
                     </button>
-                    <field name="factura_original_id" position="after">
-                        <field name="pdf_fel_name" invisible="1"/>
-                        <field name="pdf_fel" readonly="1" filename="pdf_fel_name"/>
-                    </field>
                 </data>
             </field>
         </record>

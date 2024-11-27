@@ -11,9 +11,6 @@ import requests
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    pdf_fel = fields.Binary('PDF FE', copy=False)
-    pdf_fel_name = fields.Char('Nombre PDF FE', default='pdf_fel.pdf', size=32)
-
     def _post(self, soft=True):
         if self.certificar_cr():
             return super(AccountMove, self)._post(soft)
@@ -186,16 +183,17 @@ class AccountMove(models.Model):
     def consultar_pdf(self):
         logging.warning('consultar_pdf')
         for factura in self:
-            logging.warning(factura.id)
-            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultarBytesPDF?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
-            logging.warning(r)
+            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ObtenerBytesPdfEmision?usuario={}&clave={}&NumCuenta={}&consecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            logging.warning(r.text)
+            factura.pdf_fel = r.json()['Datos']
 
     def consultar_xml(self):
         logging.warning('consultar_xml')
         for factura in self:
             logging.warning(factura.id)
-            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultarXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
-            logging.warning(r)
+            r = requests.post("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultaXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            logging.warning(r.text)
+            factura.xml_fel = base64.b64encode(r.text.encode())
         
 #    def button_cancel(self):
 #        result = super(AccountMove, self).button_cancel()
