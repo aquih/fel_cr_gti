@@ -21,11 +21,14 @@ class AccountMove(models.Model):
     
     def certificar_cr(self):
         for factura in self:
-            logging.warning('certificar_cr');
+            url = 'www.facturaelectronica.cr'
+            if factura.journal_id.pruebas_fel:
+                url = 'pruebas.gticr.com'
+
             if factura.requiere_certificacion_cr('gticr'):
 
                 if factura.error_pre_validacion_cr():
-                    return
+                    return False
                     
                 #factura.descuento_lineas()
                 
@@ -162,7 +165,7 @@ class AccountMove(models.Model):
 
                 logging.warning(json.dumps(completo, sort_keys=True, indent=4))
                 
-                r = requests.post("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
+                r = requests.post("https://{}/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/CargarDocumento?pUsuario={}&pClave={}&pNumCuenta={}".format(url, factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel), json=completo)
                 logging.warning(r.text)
                 
                 resultado = r.json()
@@ -180,18 +183,25 @@ class AccountMove(models.Model):
             else:
                 return True
 
+        return True
+
     def consultar_pdf(self):
-        logging.warning('consultar_pdf')
         for factura in self:
-            r = requests.get("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ObtenerBytesPdfEmision?usuario={}&clave={}&NumCuenta={}&consecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            url = 'www.facturaelectronica.cr'
+            if factura.journal_id.pruebas_fel:
+                url = 'pruebas.gticr.com'
+
+            r = requests.get("https://{}/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ObtenerBytesPdfEmision?usuario={}&clave={}&NumCuenta={}&consecutivo={}".format(url, factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
             logging.warning(r.text)
             factura.pdf_fel = r.json()['Datos']
 
     def consultar_xml(self):
-        logging.warning('consultar_xml')
         for factura in self:
-            logging.warning(factura.id)
-            r = requests.post("https://pruebas.gticr.com/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultaXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
+            url = 'www.facturaelectronica.cr'
+            if factura.journal_id.pruebas_fel:
+                url = 'pruebas.gticr.com'
+
+            r = requests.post("https://{}/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultaXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(url, factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
             logging.warning(r.text)
             factura.xml_fel = base64.b64encode(r.text.encode())
         
