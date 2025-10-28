@@ -7,8 +7,8 @@
         <field name="inherit_id" ref="fel_cr.invoice_form_fel_cr"/>
         <field name="arch" type="xml">
             <button name="button_draft" position="after">
-                <button name="consultar_pdf" id="consultar_pdf" string="Consultar PDF" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
-                <button name="consultar_xml" id="consultar_xml" string="Consultar XML" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
+                <button name="consultar_pdf" id="consultar_pdf" string="Consultar PDF CR" type="object" invisible="consecutivo_fel == False"/>
+                <button name="consultar_xml" id="consultar_xml" string="Consultar XML CR" type="object" invisible="consecutivo_fel == False"/>
             </button>
         </field>
     </record>
