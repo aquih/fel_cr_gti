@@ -14,10 +14,6 @@ class AccountMove(models.Model):
     def _post(self, soft=True):
         if self.certificar_cr():
             return super(AccountMove, self)._post(soft)
-
-    def post(self):
-        if self.certificar_cr():
-            return super(AccountMove, self).post()
     
     def certificar_cr(self):
         for factura in self:
@@ -29,9 +25,7 @@ class AccountMove(models.Model):
 
                 if factura.error_pre_validacion_cr():
                     return False
-                    
-                #factura.descuento_lineas()
-                
+                                    
                 completo = {}
                 completo['NumCuenta'] = factura.company_id.numero_cuenta_fel
                 
@@ -110,10 +104,8 @@ class AccountMove(models.Model):
                     
                     if tipo_producto == 'B':
                         total_global_mercaderia += linea.price_unit * linea.quantity
-                        #total_global_mercaderia += total_linea
                     else:
                         total_global_servicio += linea.price_unit * linea.quantity
-                        #total_global_servicio += total_linea
                     total_global_descuento += descuento
                     total_global_impuestos += total_impuestos
                     
@@ -161,7 +153,6 @@ class AccountMove(models.Model):
                 doc['Totales']['TotalVentaNeta'] = total_global_servicio + total_global_mercaderia - total_global_descuento
                 doc['Totales']['TotalImpuesto'] = total_global_impuestos
                 doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia + total_global_impuestos
-                #doc['Totales']['TotalComprobante'] = total_global_servicio + total_global_mercaderia
 
                 logging.warning(json.dumps(completo, sort_keys=True, indent=4))
                 
@@ -204,26 +195,6 @@ class AccountMove(models.Model):
             r = requests.post("https://{}/AplicacionFEPruebas/ApiCargaFactura/api/Documentos/ConsultaXMLEnviado?pUsuario={}&pClave={}&pNumCuenta={}&pConsecutivo={}".format(url, factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.numero_cuenta_fel, factura.consecutivo_fel))
             logging.warning(r.text)
             factura.xml_fel = base64.b64encode(r.text.encode())
-        
-#    def button_cancel(self):
-#        result = super(AccountMove, self).button_cancel()
-#        for factura in self:
-#            if factura.requiere_certificacion() and factura.firma_fel:
-#                
-#                wsdl = "https://www.facturaenlineagt.com/aanulacion?wsdl"
-#                if factura.company_id.pruebas_fel:
-#                    wsdl = "http://pruebas.ecofactura.com.gt:8080/fel/aanulacion?wsdl"
-#                client = zeep.Client(wsdl=wsdl)
-#                
-#                resultado = client.service.Execute(factura.company_id.vat, factura.company_id.usuario_fel, factura.company_id.clave_fel, factura.company_id.vat, factura.firma_fel, factura.motivo_fel)
-#                logging.warn(resultado)
-#                resultadoBytes = bytes(bytearray(resultado, encoding='utf-8'))
-#                resultadoXML = etree.XML(resultadoBytes)
-#                factura.pdf_fel = resultadoXML.xpath("/DTE/Pdf")[0].text
-#                logging.warn(resultado)
-#
-#                if not resultadoXML.xpath("/DTE"):
-#                    raise ValidationError(resultado)
                                                 
 class AccountJournal(models.Model):
     _inherit = "account.journal"

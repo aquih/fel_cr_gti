@@ -1,50 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
-        <record model="ir.ui.view" id="account_move_form_fel_cr_gti">
-            <field name="name">account.move.form.fel_cr_gti</field>
-            <field name="model">account.move</field>
-            <field name="inherit_id" ref="fel_cr.invoice_form_fel_cr"/>
-            <field name="arch" type="xml">
-                <data>
-		    <button name="button_draft" position="after">
-                        <button name="consultar_pdf" id="consultar_pdf" string="Consultar PDF" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
-                        <button name="consultar_xml" id="consultar_xml" string="Consultar XML" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
-                    </button>
-                </data>
-            </field>
-        </record>
+    <record model="ir.ui.view" id="account_move_form_fel_cr_gti">
+        <field name="name">account.move.form.fel_cr_gti</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="fel_cr.invoice_form_fel_cr"/>
+        <field name="arch" type="xml">
+            <button name="button_draft" position="after">
+                <button name="consultar_pdf" id="consultar_pdf" string="Consultar PDF" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
+                <button name="consultar_xml" id="consultar_xml" string="Consultar XML" type="object" attrs="{'invisible' : [('consecutivo_fel', '=', False)]}"/>
+            </button>
+        </field>
+    </record>
 
-        <record model="ir.ui.view" id="journal_form_fel_cr_gti">
-            <field name="name">account.journal.form.fel_cr_gti</field>
-            <field name="model">account.journal</field>
-            <field name="inherit_id" ref="fel_cr.journal_form_fel_cr"/>
-            <field name="arch" type="xml">
-                <data>
-                    <field name="contingencia_fel" position="after">
-                        <field name="sucursal_fel"/>
-                        <field name="terminal_fel"/>
-                    </field>
-                </data>
+    <record model="ir.ui.view" id="journal_form_fel_cr_gti">
+        <field name="name">account.journal.form.fel_cr_gti</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="fel_cr.journal_form_fel_cr"/>
+        <field name="arch" type="xml">
+            <field name="contingencia_fel" position="after">
+                <field name="sucursal_fel"/>
+                <field name="terminal_fel"/>
             </field>
-        </record>
-        
-        <record id="view_company_form_fel_cr_gti" model="ir.ui.view">
-            <field name="name">res.company.form.fel_cr_gti</field>
-            <field name="model">res.company</field>
-            <field name="inherit_id" ref="fel_cr.view_company_form_fel_cr"/>
-            <field name="arch" type="xml">
-                <data>
-                    <field name="certificador_cr_fel" position="after">
-                        <field name="numero_cuenta_fel"/>
-                        <field name="usuario_fel"/>
-                        <field name="clave_fel"/>
-                        <field name="pruebas_fel"/>
-                    </field>
-                </data>
+        </field>
+    </record>
+    
+    <record id="view_company_form_fel_cr_gti" model="ir.ui.view">
+        <field name="name">res.company.form.fel_cr_gti</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="fel_cr.view_company_form_fel_cr"/>
+        <field name="arch" type="xml">
+            <field name="certificador_cr_fel" position="after">
+                <field name="numero_cuenta_fel"/>
+                <field name="usuario_fel"/>
+                <field name="clave_fel"/>
+                <field name="pruebas_fel"/>
             </field>
-        </record>
+        </field>
+    </record>
 
-    </data>
-</openerp>
+<odoo>

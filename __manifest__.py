@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 
 {
-    'name': 'FEL CR GTI',
-    'version': '1.0',
+    'name': 'FEL Costa Rica GTI',
+    'version': '2.0',
     'category': 'Custom',
     'description': """ Integración con factura electrónica de GTI para Costa Rica """,
     'author': 'aquíH',
